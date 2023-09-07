@@ -39,3 +39,7 @@ cdk deploy --profile mep-${ENV} --require-approval never
 ├── test
 │   └── newton-infra.test.ts
 └── tsconfig.json
+
+## 手で作成したリソース
+- TransitGatewayへのRoute追加。これはCDKが未対応のため、手動で作成。
+  - platform-pri-1(2)-subのルートテーブルで、pl-02f50133943bce44b(misumi-common-route)宛をtgw-0b5484e54a8af8332へ

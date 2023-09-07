@@ -26,4 +26,5 @@ export const createStack = (app: cdk.App, id: string, envIdentifier: Envs) => {
   Tags.of(stack).add("Env", envIdentifier);
   Tags.of(stack).add("CostCenter", "2467");
   Tags.of(stack).add("EnvNumber", "01");
+  return stack;
 }
