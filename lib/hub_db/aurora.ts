@@ -73,7 +73,7 @@ const makeDb = (newtonHubDbStack: Stack, param: Parameters, existingResource: Re
   });
 
   // platform-iso-1(2)-sub
-  const subnets = existingResource.subnetIds.map(subnetId =>
+  const subnets = existingResource.dbSubnetIds.map(subnetId =>
     aws_ec2.Subnet.fromSubnetId(newtonHubDbStack, subnetId, subnetId));
 
   return new aws_rds.DatabaseCluster(newtonHubDbStack, clusterIdentifier, {

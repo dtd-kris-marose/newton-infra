@@ -16,7 +16,7 @@ const instanceType = envIdentifier === "prd" ? InstanceType.r6gLarge : InstanceT
 // 本番writerは1台 + reader1台、それ以外はwriterのみ
 const readerCount = envIdentifier === "prd" ? 1 : 0;
 
-const mepNewtonHubDbStack = createStack(app, "MepNewtonHubDbStack");
+const mepNewtonHubDbStack = createStack(app, "MepNewtonHubDbStack", envIdentifier);
 createNewtonHubDb(mepNewtonHubDbStack, {
   adminPasswordSsmPath: "/mep/newtonHub/admin/DB_PASSWORD",
   namePrefix: "mep",
@@ -25,7 +25,7 @@ createNewtonHubDb(mepNewtonHubDbStack, {
   readerCount
 });
 
-const mepOpNewtonHubDbStack = createStack(app, "MepOpNewtonHubDbStack");
+const mepOpNewtonHubDbStack = createStack(app, "MepOpNewtonHubDbStack", envIdentifier);
 createNewtonHubDb(mepOpNewtonHubDbStack, {
   adminPasswordSsmPath: "/mepop/newtonHub/admin/DB_PASSWORD",
   namePrefix: "mepop",
