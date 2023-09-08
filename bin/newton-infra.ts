@@ -24,12 +24,3 @@ createNewtonHubDb(mepNewtonHubDbStack, {
   instanceType,
   readerCount
 });
-
-const mepOpNewtonHubDbStack = createStack(app, "MepOpNewtonHubDbStack", envIdentifier);
-createNewtonHubDb(mepOpNewtonHubDbStack, {
-  adminPasswordSsmPath: "/mepop/newtonHub/admin/DB_PASSWORD",
-  namePrefix: "mepop",
-  envIdentifier,
-  instanceType,
-  readerCount
-});
