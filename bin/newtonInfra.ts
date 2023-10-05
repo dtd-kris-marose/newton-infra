@@ -2,6 +2,8 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import {createNewtonHubDb} from "../lib/hub_db/aurora";
 import {createStack, Envs, InstanceType, isValidEnv} from "../lib/common";
+import {createServices} from "../lib/ecs/ecs";
+import {createBase} from "../lib/base/base";
 
 const app = new cdk.App();
 
@@ -10,17 +12,23 @@ if (!isValidEnv(envIdentifier)) {
   throw new Error("export ENV, before exec cdk. ENV...[dev or stg or prd]");
 }
 
-// 本番はlarge, それ以外はmediumにしとく
-// arm系でコスト削減
-const instanceType = envIdentifier === "prd" ? InstanceType.r6gLarge : InstanceType.t4gMedium;
-// 本番writerは1台 + reader1台、それ以外はwriterのみ
-const readerCount = envIdentifier === "prd" ? 1 : 0;
+///////////////////////// ベースリソース /////////////////////////
+const mepNewtonBaseStack = createStack(app, "MepNewtonBaseResourceStack", envIdentifier);
+const {hostedZone, newtonApiProxyRepository} = createBase(mepNewtonBaseStack, {envIdentifier});
 
+/////////////////////////   hub db   /////////////////////////
+const instanceType = envIdentifier === "prd" ? InstanceType.r6gLarge : InstanceType.t4gMedium;
+const readerCount = envIdentifier === "prd" ? 1 : 0;
 const mepNewtonHubDbStack = createStack(app, "MepNewtonHubDbStack", envIdentifier);
 createNewtonHubDb(mepNewtonHubDbStack, {
   adminPasswordSsmPath: "/mep/newtonHub/admin/DB_PASSWORD",
   namePrefix: "mep",
   envIdentifier,
   instanceType,
-  readerCount
+  readerCount,
+  hostedZone,
 });
+
+///////////////////////// newton用proxy /////////////////////////
+const newtonEcsStack = createStack(app, "MepNewtonEcsStack", envIdentifier);
+createServices(newtonEcsStack, {envIdentifier, newtonApiProxyRepository, hostedZone});

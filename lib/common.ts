@@ -27,4 +27,10 @@ export const createStack = (app: cdk.App, id: string, envIdentifier: Envs) => {
   Tags.of(stack).add("CostCenter", "2467");
   Tags.of(stack).add("EnvNumber", "01");
   return stack;
-}
+};
+
+export const restoreExistingVpc = (stack: cdk.Stack, vpcId: string) =>
+  aws_ec2.Vpc.fromVpcAttributes(stack, vpcId, {
+    vpcId: vpcId,
+    availabilityZones: [stack.region],
+  });

@@ -26,7 +26,7 @@ cdk deploy --profile mep-${ENV} --require-approval never
 
 ├── README.md
 ├── bin
-│   └── newton-infra.ts
+│   └── newtonInfra.ts
 ├── cdk.json
 ├── jest.config.js
 ├── lib
