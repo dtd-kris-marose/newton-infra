@@ -19,7 +19,6 @@ export const existingResources: { envs: { [key in Envs]: Resources } } = {
         dx: "tgw-0b5484e54a8af8332"
       },
       newtonApiFqdn: "stg02-api-newton-jp.internal.misumi-ec.com",
-      proxyFqdn: "newton-api.dev.partners.meviy.io",
       certificateArn: "arn:aws:acm:ap-northeast-1:057760758614:certificate/fdf94f54-16d9-42b2-af06-4dedcf33a151"
     },
     stg: {
@@ -38,7 +37,6 @@ export const existingResources: { envs: { [key in Envs]: Resources } } = {
         dx: "tgw-0b5484e54a8af8332"
       },
       newtonApiFqdn: "stg02-api-newton-jp.internal.misumi-ec.com",
-      proxyFqdn: "newton-api.stg.partners.meviy.io",
       certificateArn: ""
     },
     prd: {
@@ -57,7 +55,6 @@ export const existingResources: { envs: { [key in Envs]: Resources } } = {
         dx: "tgw-0b5484e54a8af8332"
       },
       newtonApiFqdn: "api-newton-jp.internal.misumi-ec.com",
-      proxyFqdn: "newton-api.partners.meviy.io",
       certificateArn: ""
     }
   }
@@ -77,6 +74,5 @@ export type Resources = {
     dx: string
   },
   newtonApiFqdn: string,
-  proxyFqdn: string,
   certificateArn: string
 };

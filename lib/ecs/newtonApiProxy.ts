@@ -53,7 +53,7 @@ export const createNewtonApiProxy = (stack: Stack, param: Parameters) => {
     containerName: SERVICE_NAME,
     environment: {
       PROXY_PASS: existingResource.newtonApiFqdn,
-      SERVER_NAME: existingResource.proxyFqdn,
+      SERVER_NAME: `api.${param.privateHostedZone.zoneName}`,
     }
   });
 
