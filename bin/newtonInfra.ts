@@ -1,7 +1,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import {createNewtonHubDb} from "../lib/hub_db/aurora";
-import {createStack, Envs, InstanceType, isValidEnv} from "../lib/common";
+import {createStack, Envs, InstanceType, isValidEnv, restoreExistingPrivateZone} from "../lib/common";
 import {createServices} from "../lib/ecs/ecs";
 import {createBase} from "../lib/base/base";
 
@@ -14,7 +14,8 @@ if (!isValidEnv(envIdentifier)) {
 
 ///////////////////////// ベースリソース /////////////////////////
 const mepNewtonBaseStack = createStack(app, "MepNewtonBaseResourceStack", envIdentifier);
-const {hostedZone, newtonApiProxyRepository} = createBase(mepNewtonBaseStack, {envIdentifier});
+const {newtonApiProxyRepository, cluster, vpc} = createBase(mepNewtonBaseStack, envIdentifier);
+const hostedZone = restoreExistingPrivateZone(mepNewtonBaseStack, envIdentifier);
 
 /////////////////////////   hub db   /////////////////////////
 const instanceType = envIdentifier === "prd" ? InstanceType.r6gLarge : InstanceType.t4gMedium;
@@ -26,9 +27,9 @@ createNewtonHubDb(mepNewtonHubDbStack, {
   envIdentifier,
   instanceType,
   readerCount,
-  hostedZone,
+  hostedZone: hostedZone,
 });
 
 ///////////////////////// newton用proxy /////////////////////////
 const newtonEcsStack = createStack(app, "MepNewtonEcsStack", envIdentifier);
-createServices(newtonEcsStack, {envIdentifier, newtonApiProxyRepository, hostedZone});
+createServices(newtonEcsStack, {envIdentifier, newtonApiProxyRepository, hostedZone: hostedZone, cluster, vpc});
