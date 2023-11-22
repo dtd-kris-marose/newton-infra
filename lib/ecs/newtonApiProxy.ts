@@ -12,7 +12,7 @@ import {Cluster, PropagatedTagSource} from "aws-cdk-lib/aws-ecs";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
 import {Repository} from "aws-cdk-lib/aws-ecr";
 import {ApplicationTargetGroup} from "aws-cdk-lib/aws-elasticloadbalancingv2";
-import {PrivateHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
+import {IPrivateHostedZone, RecordTarget} from "aws-cdk-lib/aws-route53";
 
 type Parameters = {
   envIdentifier: Envs,
@@ -21,7 +21,7 @@ type Parameters = {
   cluster: Cluster,
   vpc: IVpc,
   newtonApiProxyRepository: Repository,
-  privateHostedZone: PrivateHostedZone
+  privateHostedZone: IPrivateHostedZone
 };
 
 const SERVICE_NAME = "newton-api-proxy";
@@ -53,7 +53,7 @@ export const createNewtonApiProxy = (stack: Stack, param: Parameters) => {
     containerName: SERVICE_NAME,
     environment: {
       PROXY_PASS: existingResource.newtonApiFqdn,
-      SERVER_NAME: `api.${param.privateHostedZone.zoneName}`,
+      SERVER_NAME: `${SERVICE_NAME}.${param.privateHostedZone.zoneName}`,
     }
   });
 
@@ -107,12 +107,13 @@ export const createNewtonApiProxy = (stack: Stack, param: Parameters) => {
 
   new aws_route53.ARecord(stack, "NewtonApiLocalName", {
     zone: param.privateHostedZone,
-    recordName: `api.${param.privateHostedZone.zoneName}`,
+    recordName: `${SERVICE_NAME}.${param.privateHostedZone.zoneName}`,
     target: RecordTarget.fromAlias(new aws_route53_targets.LoadBalancerTarget(alb)),
   });
 };
 
-// 一度L1で作ってからmutable:falseで作り直さないと勝手にルールが追加されてしまう
+// DDの依頼からprefixListを使う必要があるが、
+// 一度L1で作ってからmutable:falseで作り直さないと勝手にsgIdを使ったルールが追加されてしまう
 const createSg = (stack: Stack, vpcId: string, existingResource: Resources) => {
   const _sg = new aws_ec2.CfnSecurityGroup(stack, "_NewtonApiProxySg", {
     vpcId,

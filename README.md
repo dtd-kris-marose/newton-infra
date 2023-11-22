@@ -38,13 +38,10 @@ cdk deploy --profile mep-${ENV} --require-approval never
 ├── lib
 │   ├── base
 │   │   ├── base.ts # 共通リソース作成関数
-│   │   ├── ecr
-│   │   │   └── ecr.ts
-│   │   └── route53
-│   │       └── privateHostedZone.ts
+│   │   └── ecr
+│   │       └── ecr.ts
 │   ├── common.ts # 共通定数や便利関数とか
 │   ├── ecs
-│   │   ├── ecs.ts
 │   │   └── newtonApiProxy.ts
 │   ├── existingResources.ts # 既存リソースのarnとかをベタ書きするところ
 │   └── hub_db

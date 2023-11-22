@@ -5,7 +5,7 @@ import {Envs, restoreExistingVpc} from "../common";
 import {DatabaseCluster, DatabaseClusterEngine} from "aws-cdk-lib/aws-rds";
 import {InstanceType} from "aws-cdk-lib/aws-ec2";
 import {existingResources, Resources} from "../existingResources";
-import {PrivateHostedZone} from "aws-cdk-lib/aws-route53";
+import {IPrivateHostedZone} from "aws-cdk-lib/aws-route53";
 
 type Parameters = {
   envIdentifier: Envs,
@@ -13,7 +13,7 @@ type Parameters = {
   adminPasswordSsmPath: string,
   readerCount: 0 | 1, // writer + readerの2台体制か、 writerのみ
   instanceType: InstanceType,
-  hostedZone: PrivateHostedZone
+  hostedZone: IPrivateHostedZone
 };
 
 export const createNewtonHubDb = (newtonHubDbStack: Stack, param: Parameters) => {

@@ -1,9 +1,17 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import {createNewtonHubDb} from "../lib/hub_db/aurora";
-import {createStack, Envs, InstanceType, isValidEnv} from "../lib/common";
-import {createServices} from "../lib/ecs/ecs";
+import {
+  createStack,
+  Envs,
+  InstanceType,
+  isValidEnv,
+  restoreExistingPrivateZone,
+  restoreExistingVpc
+} from "../lib/common";
 import {createBase} from "../lib/base/base";
+import {existingResources} from "../lib/existingResources";
+import {createNewtonApiProxy} from "../lib/ecs/newtonApiProxy";
 
 const app = new cdk.App();
 
@@ -14,7 +22,9 @@ if (!isValidEnv(envIdentifier)) {
 
 ///////////////////////// ベースリソース /////////////////////////
 const mepNewtonBaseStack = createStack(app, "MepNewtonBaseResourceStack", envIdentifier);
-const {hostedZone, newtonApiProxyRepository} = createBase(mepNewtonBaseStack, {envIdentifier});
+const vpc = restoreExistingVpc(mepNewtonBaseStack, existingResources.envs[envIdentifier].platformVpcId);
+const {newtonApiProxyRepository, cluster} = createBase(mepNewtonBaseStack, vpc);
+const hostedZone = restoreExistingPrivateZone(mepNewtonBaseStack, envIdentifier);
 
 /////////////////////////   hub db   /////////////////////////
 const instanceType = envIdentifier === "prd" ? InstanceType.r6gLarge : InstanceType.t4gMedium;
@@ -26,9 +36,19 @@ createNewtonHubDb(mepNewtonHubDbStack, {
   envIdentifier,
   instanceType,
   readerCount,
-  hostedZone,
+  hostedZone: hostedZone,
 });
 
 ///////////////////////// newton用proxy /////////////////////////
 const newtonEcsStack = createStack(app, "MepNewtonEcsStack", envIdentifier);
-createServices(newtonEcsStack, {envIdentifier, newtonApiProxyRepository, hostedZone});
+const PROXY_IMAGE_TAG = "1.0.1";
+const taskCount = envIdentifier === "prd" ? 2 : 1;
+createNewtonApiProxy(newtonEcsStack, {
+  envIdentifier,
+  imageTag: PROXY_IMAGE_TAG,
+  taskCount,
+  cluster,
+  vpc,
+  newtonApiProxyRepository,
+  privateHostedZone: hostedZone,
+});
