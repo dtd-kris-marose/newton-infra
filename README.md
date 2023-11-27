@@ -22,23 +22,36 @@ cdk deploy --profile mep-${ENV} --require-approval never
 ```
 
 ## ディレクトリ構成
-基本的にlib内にdirを切って定義する
+- 基本的にlib内にdirを切って定義する
 
+```text
 ├── README.md
 ├── bin
-│   └── newton-infra.ts
+│   └── newtonInfra.ts # cdkのentrypoint
 ├── cdk.json
+├── docker
+│   └── proxy
+│       ├── Dockerfile
+│       ├── build_and_push.sh
+│       └── default.conf.template
 ├── jest.config.js
 ├── lib
-│   ├── existingResources.ts # 既存リソースのarnやidを書く場所
-│   ├── common.ts            # 定数や便利関数置き場
+│   ├── base
+│   │   ├── base.ts # 共通リソース作成関数
+│   │   └── ecr
+│   │       └── ecr.ts
+│   ├── common.ts # 共通定数や便利関数とか
+│   ├── ecs
+│   │   ├── ecs.ts
+│   │   └── newtonApiProxy.ts
+│   ├── existingResources.ts # 既存リソースのarnとかをベタ書きするところ
 │   └── hub_db
-│       └── aurora.ts        # NEWTON HUB DBの定義
-├── package-lock.json
+│       └── aurora.ts
 ├── package.json
 ├── test
 │   └── newton-infra.test.ts
 └── tsconfig.json
+```
 
 ## 手で作成したリソース
 - TransitGatewayへのRoute追加。これはCDKが未対応のため、手動で作成。

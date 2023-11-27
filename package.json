@@ -2,7 +2,7 @@
   "name": "newton-infra",
   "version": "0.1.0",
   "bin": {
-    "newton-infra": "bin/newton-infra.js"
+    "newton-infra": "bin/newtonInfra.ts"
   },
   "scripts": {
     "build": "tsc",

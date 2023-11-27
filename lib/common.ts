@@ -1,5 +1,7 @@
 import {aws_ec2, Tags} from "aws-cdk-lib";
 import * as cdk from "aws-cdk-lib";
+import {PrivateHostedZone} from "aws-cdk-lib/aws-route53";
+import {existingResources} from "./existingResources";
 
 export type Envs = "dev" | "stg" | "prd";
 export const isValidEnv = (env: string) => env === "dev" || env === "stg" || env === "prd";
@@ -27,4 +29,20 @@ export const createStack = (app: cdk.App, id: string, envIdentifier: Envs) => {
   Tags.of(stack).add("CostCenter", "2467");
   Tags.of(stack).add("EnvNumber", "01");
   return stack;
-}
+};
+
+export const restoreExistingVpc = (stack: cdk.Stack, vpcId: string) =>
+  aws_ec2.Vpc.fromVpcAttributes(stack, vpcId, {
+    vpcId: vpcId,
+    availabilityZones: [stack.region],
+  });
+
+export const restoreExistingPrivateZone = (stack: cdk.Stack, envIdentifier: Envs) =>
+  PrivateHostedZone.fromHostedZoneAttributes(
+    stack,
+    existingResources.envs[envIdentifier].privateHostedZoneId,
+    {
+      hostedZoneId: existingResources.envs[envIdentifier].privateHostedZoneId,
+      zoneName: `${envIdentifier}.local`
+    }
+  );
